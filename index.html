@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>다산 자연&e편한세상3차 분양전환 안내 챗봇</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Nanum+Gothic:wght@400;700;800&display=swap');
+
+  :root {
+    --primary: #1a4f8a;
+    --primary-light: #2563ab;
+    --accent: #e8821a;
+    --bg: #f0f4f9;
+    --surface: #ffffff;
+    --bot-bubble: #eaf0fb;
+    --user-bubble: #1a4f8a;
+    --text: #1e2d3d;
+    --text-muted: #6b7f96;
+    --border: #d0dcea;
+    --shadow: 0 4px 24px rgba(26,79,138,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  .chat-wrapper {
+    width: 100%;
+    max-width: 700px;
+    background: var(--surface);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    height: 92vh;
+    max-height: 820px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  /* Header */
+  .chat-header {
+    background: linear-gradient(135deg, var(--primary) 0%, #1e3f73 100%);
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+  }
+
+  .header-icon {
+    width: 46px; height: 46px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  .header-text h1 {
+    font-family: 'Nanum Gothic', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.3;
+  }
+
+  .header-text p {
+    font-size: 12px;
+    color: rgba(255,255,255,0.65);
+    margin-top: 2px;
+  }
+
+  .header-badge {
+    margin-left: auto;
+    background: #4ade80;
+    color: #064e3b;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    flex-shrink: 0;
+  }
+
+  /* Quick questions */
+  .quick-area {
+    padding: 10px 16px 8px;
+    background: #f8fafd;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .quick-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 7px;
+    font-weight: 500;
+  }
+
+  .quick-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .quick-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 12px;
+    color: var(--primary);
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: all 0.18s;
+    white-space: nowrap;
+  }
+
+  .quick-btn:hover {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+    transform: translateY(-1px);
+  }
+
+  /* Messages */
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    scroll-behavior: smooth;
+  }
+
+  .messages::-webkit-scrollbar { width: 4px; }
+  .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .msg-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+
+  .msg-row.user {
+    flex-direction: row-reverse;
+  }
+
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    background: var(--bot-bubble);
+    border: 1px solid var(--border);
+  }
+
+  .msg-row.user .avatar {
+    background: var(--user-bubble);
+  }
+
+  .bubble {
+    max-width: 80%;
+    padding: 12px 15px;
+    border-radius: 16px;
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: var(--text);
+    background: var(--bot-bubble);
+    border: 1px solid #dae6f5;
+    border-bottom-left-radius: 4px;
+    word-break: keep-all;
+  }
+
+  .msg-row.user .bubble {
+    background: var(--user-bubble);
+    color: #fff;
+    border-color: var(--user-bubble);
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 16px;
+  }
+
+  .bubble strong { color: var(--primary); font-weight: 700; }
+  .msg-row.user .bubble strong { color: #bdd7ff; }
+  .bubble ul { padding-left: 18px; margin-top: 6px; }
+  .bubble li { margin-bottom: 4px; }
+  .bubble .highlight {
+    background: #fff3cd;
+    border-left: 3px solid var(--accent);
+    padding: 8px 10px;
+    margin-top: 8px;
+    border-radius: 0 6px 6px 0;
+    font-size: 13px;
+    color: #7c4a00;
+  }
+  .bubble .tag {
+    display: inline-block;
+    background: #e8f0ff;
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-bottom: 6px;
+  }
+
+  /* Typing */
+  .typing {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    padding: 14px 16px;
+  }
+  .typing span {
+    width: 7px; height: 7px;
+    background: var(--text-muted);
+    border-radius: 50%;
+    animation: bounce 1.2s infinite;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-6px); }
+  }
+
+  /* Input */
+  .input-area {
+    padding: 12px 14px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .input-area input {
+    flex: 1;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 11px 15px;
+    font-size: 13.5px;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.18s;
+    background: #f8fafd;
+  }
+
+  .input-area input:focus {
+    border-color: var(--primary);
+    background: #fff;
+  }
+
+  .send-btn {
+    width: 42px; height: 42px;
+    background: var(--primary);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.18s, transform 0.12s;
+  }
+
+  .send-btn:hover { background: var(--primary-light); transform: scale(1.05); }
+  .send-btn:disabled { background: #b0c4de; cursor: not-allowed; transform: none; }
+
+  .send-btn svg { width: 18px; height: 18px; fill: white; }
+
+  .footer-note {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    padding: 6px 0 4px;
+  }
+
+  @media (max-width: 480px) {
+    body { padding: 0; align-items: flex-start; }
+    .chat-wrapper { height: 100vh; max-height: none; border-radius: 0; }
+    .quick-btn { font-size: 11.5px; }
+  }
+</style>
+</head>
+<body>
+<div class="chat-wrapper">
+  <div class="chat-header">
+    <div class="header-icon">🏠</div>
+    <div class="header-text">
+      <h1>다산 자연&amp; e편한세상3차<br>분양전환 안내 챗봇</h1>
+      <p>10년 공공임대주택 조기분양전환 전용</p>
+    </div>
+    <div class="header-badge">● 운영중</div>
+  </div>
+
+  <div class="quick-area">
+    <div class="quick-label">💬 자주 묻는 질문</div>
+    <div class="quick-btns">
+      <button class="quick-btn" onclick="sendQuick('계약 기간이 언제예요?')">📅 계약 기간</button>
+      <button class="quick-btn" onclick="sendQuick('대상자 조건이 뭐예요?')">✅ 대상자 조건</button>
+      <button class="quick-btn" onclick="sendQuick('분양가격은 어떻게 결정되나요?')">💰 분양가격</button>
+      <button class="quick-btn" onclick="sendQuick('납부 방법을 알려주세요')">💳 납부 방법</button>
+      <button class="quick-btn" onclick="sendQuick('필요한 서류가 뭐예요?')">📋 필요 서류</button>
+      <button class="quick-btn" onclick="sendQuick('소유권이전등기는 어떻게 하나요?')">🏛️ 소유권 이전</button>
+      <button class="quick-btn" onclick="sendQuick('사전예약은 어떻게 해요?')">📞 사전예약</button>
+      <button class="quick-btn" onclick="sendQuick('취득세는 어떻게 되나요?')">🧾 취득세</button>
+    </div>
+  </div>
+
+  <div class="messages" id="messages">
+    <div class="msg-row bot">
+      <div class="avatar">🤖</div>
+      <div class="bubble">
+        <span class="tag">안내 챗봇</span><br>
+        안녕하세요! <strong>다산 자연&amp; e편한세상3차 분양전환 안내 챗봇</strong>입니다. 😊<br><br>
+        조기분양전환 계약에 관해 궁금한 점을 질문해 주세요. 위의 자주 묻는 질문 버튼을 눌러도 됩니다!<br><br>
+        <div class="highlight">⚠️ 이 챗봇은 공식 안내문 내용만을 기반으로 답변합니다. 구체적인 사항은 임대센터(031-515-0887)에 문의하세요.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-area">
+    <input type="text" id="userInput" placeholder="질문을 입력하세요..." onkeydown="if(event.key==='Enter') sendMessage()" />
+    <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+      <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+    </button>
+  </div>
+  <div class="footer-note">공식 안내문 기반 · 법적 효력 없음 · 문의 ☎ 031-515-0887</div>
+</div>
+
+<script>
+// ============================================================
+// 지식베이스 (안내문 전체 내용 기반)
+// ============================================================
+const KB = {
+  계약기간: {
+    keywords: ['계약기간','계약 기간','언제까지','계약일','기간','마감','종료'],
+    answer: `<span class="tag">📅 계약기간</span><br>
+<strong>분양전환 계약기간</strong>은 다음과 같습니다:<br><br>
+📌 <strong>2026년 5월 14일(목) ~ 2027년 5월 13일(목)</strong><br>
+⏰ 오전 10시 ~ 오후 5시<br><br>
+<ul>
+<li>12~13시는 점심 휴게시간</li>
+<li>토·일 및 공휴일은 휴무</li>
+</ul>
+<div class="highlight">⚠️ 계약기간 종료 후에는 <strong>계약체결이 불가</strong>합니다. 반드시 기간 내 계약하세요!</div>`
+  },
+  사전예약: {
+    keywords: ['사전예약','예약','방문','예약제','15일'],
+    answer: `<span class="tag">📞 사전예약</span><br>
+<strong>계약체결 15일 전 사전예약제</strong>를 운영합니다.<br><br>
+<ul>
+<li>예약 없이 방문하면 계약체결이 <strong>불가</strong>합니다</li>
+<li>전화로 사전예약 필수: <strong>☎ 031-515-0887</strong></li>
+</ul>
+<div class="highlight">💡 임대보증금 채권에 권리제한이 있는 경우, 15일보다 더 이른 시점에 사전예약하세요.</div>
+계약장소: 경기도 남양주시 다산중앙로82번길 106, 206호 (6402동 앞 상가1동)`
+  },
+  대상자: {
+    keywords: ['대상자','자격','조건','누가','신청자격','해당','무주택'],
+    answer: `<span class="tag">✅ 조기분양전환 대상자</span><br>
+조기분양전환 신청기간 내 신청서를 제출한 임차인 중:<br><br>
+<ul>
+<li>① 입주일부터 분양전환 시까지 <strong>계속 거주한 무주택자</strong></li>
+<li>② 입주 후 상속·판결·혼인으로 주택 취득 → 분양전환 전 처분하여 무주택자 된 경우</li>
+<li>③ 공공주택 특별법 제49조의4에 따라 임차권 양도받아 거주한 무주택자</li>
+<li>④ 선착순 입주자로 선정되어 계속 거주하며 주택소유기준 충족하는 경우</li>
+<li>⑤ 계약일 현재 공사와 임대차계약을 유지 중인 임차인 (미갱신자는 갱신 후 계약 가능)</li>
+</ul>
+<div class="highlight">⚠️ 무주택자 = 임차인 본인과 <strong>세대원 전원</strong>이 무주택을 유지한 자</div>`
+  },
+  분양가격: {
+    keywords: ['분양가','가격','얼마','가격산정','전환가격','평가'],
+    answer: `<span class="tag">💰 분양전환가격</span><br>
+세대 유형에 따라 산정 방식이 다릅니다:<br><br>
+<strong>공공임대주택:</strong><br>
+→ 두 곳 감정평가업체가 평가한 감정평가금액의 <strong>산술평균금액</strong><br><br>
+<strong>분납임대주택:</strong><br>
+→ 최초 입주자모집 공고 당시 주택가격(70%) + 감정평가금액(30%)<br><br>
+<div class="highlight">📋 세대별 분양전환 가격이 상이하므로 <strong>'분양전환주택 가격표'</strong>를 반드시 확인하세요.<br>가격 문의: GH 건설임대처 ☎ 031-220-3272, 3273</div>`
+  },
+  납부방법: {
+    keywords: ['납부','일시납','분할납부','7년','잔금','계약금','대금','입금'],
+    answer: `<span class="tag">💳 대금납부 방법</span><br>
+<strong>일시납</strong> 또는 <strong>7년 분할납부</strong> 중 선택할 수 있습니다.<br><br>
+<strong>📌 7년 분할납부</strong><br>
+<ul>
+<li>계약금: 분양전환 주택가격의 <strong>40%</strong> (상한 2억원)</li>
+<li>공공임대: 기납부한 임대보증금으로 계약금 대체</li>
+<li>잔금: 7년 거치 후 일시납 / 할부이자 연 3.0%(변동이율)</li>
+<li>중도상환: 수수료 없이 100만원 단위로 가능</li>
+</ul>
+<strong>📌 일시납</strong><br>
+<ul>
+<li>계약금: 기납부한 임대보증금으로 대체</li>
+<li>잔금: 분양전환 계약체결일로부터 <strong>2개월 내</strong> 일시납</li>
+<li>잔금 납부 완료 후 소유권이전등기 서류 교부 가능</li>
+</ul>
+<div class="highlight">🏦 납부 계좌: 우리은행 1005-104-839009 (예금주: 경기주택도시공사)<br>반드시 <strong>계좌이체</strong>로 입금 (현장납입 불가)</div>`
+  },
+  서류: {
+    keywords: ['서류','구비','필요','준비','서류','인감','주민등록','신분증'],
+    answer: `<span class="tag">📋 계약체결 시 구비서류</span><br>
+<strong>공통 제출 서류:</strong><br>
+<ul>
+<li>계약금 및 추가납부 금액 입금확인서</li>
+<li>주민등록표 등본 1부 (세대주 주민번호, 전입일/변동일 표시)</li>
+<li>주민등록표 초본 1부 (계약자 주민번호, 주소변동내역 표시)</li>
+<li>임대차계약서 1부</li>
+</ul>
+<strong>본인 계약 시 추가:</strong><br>
+<ul>
+<li>인감도장 및 인감증명서(본인발급분) 1부</li>
+<li>신분증(주민등록증 또는 운전면허증) 사본 1부</li>
+</ul>
+<strong>제3자 대리인 계약 시:</strong><br>
+<ul>
+<li>위임장(계약자 본인 작성, 인감도장 날인)</li>
+<li>계약자의 인감도장 + 인감증명서(본인발급분)</li>
+<li>본인 및 대리인의 신분증</li>
+</ul>
+<div class="highlight">⚠️ 모든 서류는 <strong>계약체결일 1개월 이내 발급분</strong>이어야 합니다.</div>`
+  },
+  소유권이전: {
+    keywords: ['소유권','이전등기','등기','법무사','GH','근저당','신청'],
+    answer: `<span class="tag">🏛️ 소유권이전등기</span><br>
+납부방법에 따라 절차가 다릅니다:<br><br>
+<strong>📌 7년 분할납부 세대</strong><br>
+→ GH에서 선정한 법무사(법무법인 제이엘)가 소유권 이전 및 근저당권 설정 등기를 대행<br>
+→ 문의: ☎ 1899-4252 (내선 0095, 5429)<br><br>
+<strong>📌 일시납 (주택도시기금 융자 미이용)</strong><br>
+→ 잔금 납부 후 본인이 원하는 법무사에게 위임 가능<br><br>
+<strong>📌 일시납 (주택도시기금 융자 이용)</strong><br>
+→ 용자금 취급은행이 지정하는 법무사가 등기 대행<br><br>
+<div class="highlight">⚠️ 분양전환가 완납(또는 분할납부 선택 시 계약체결일)부터 <strong>60일 이내</strong> 소유권이전등기 신청 필수<br>미신청 시 부동산등기 특별조치법에 따라 과태료 부과!</div>
+등기 관련 민원: 의정부지방법원 남양주지원 등기과 ☎ 1544-0773`
+  },
+  취득세: {
+    keywords: ['취득세','세금','신고','납부','실거래','부동산취득세'],
+    answer: `<span class="tag">🧾 취득세 및 실거래신고</span><br>
+<strong>📌 취득세</strong><br>
+<ul>
+<li>분양전환 계약체결일로부터 <strong>60일 이내</strong> 신고·납부</li>
+<li>방문: 남양주시 부동산취득세팀</li>
+<li>문의: ☎ 031-590-4045, 4046, 2898</li>
+</ul>
+<strong>📌 부동산 실거래신고</strong><br>
+<ul>
+<li>계약체결일로부터 <strong>30일 이내</strong></li>
+<li>우리공사(GH)에서 관할 지자체에 신고 → <strong>매수자 별도 신고 불필요</strong></li>
+</ul>
+<div class="highlight">💡 취득세는 자진 신고·납부해야 하며, 미이행 시 신고불성실 가산세 등이 부과됩니다.</div>`
+  },
+  기금융자: {
+    keywords: ['주택도시기금','기금','융자','대출','우리은행','55000000'],
+    answer: `<span class="tag">🏦 세대별 기금융자금(주택도시기금)</span><br>
+일시납 선택 세대만 해당됩니다.<br><br>
+<strong>다산 자연&amp; e편한세상3차</strong><br>
+<ul>
+<li>51㎡: 5,500만원 / 20년 원리금 균등분할상환 / 연 2.8%</li>
+<li>59㎡: 5,500만원 / 20년 원리금 균등분할상환 / 연 2.8%</li>
+</ul>
+<strong>우리은행 담당 영업점:</strong><br>
+<ul>
+<li>51㎡: 우리은행 진접금융센터 ☎ 031-572-1900</li>
+<li>59㎡: 우리은행 다산지점 ☎ 031-557-0567</li>
+</ul>
+<div class="highlight">⚠️ 우리공사가 주택도시기금을 조기상환하였으므로 각 세대별로 우리은행에 개별 신청해야 합니다.</div>`
+  },
+  부부공동명의: {
+    keywords: ['부부','공동명의','배우자','명의','증여','지분'],
+    answer: `<span class="tag">👫 부부공동명의 변경</span><br>
+분양전환 계약 후 소유권이전등기 전에 배우자에게 지분을 증여하는 방식으로 부부공동명의 소유권이전등기가 가능합니다.<br><br>
+<strong>변경 절차:</strong><br>
+분양전환계약 체결 → 지분증여계약(계약자↔배우자) → 증여계약검인(부부→시·군·구) → 명의변경신청(부부→GH) → 소유권 이전 및 근저당 설정<br><br>
+<strong>필요서류 (계약자):</strong><br>
+<ul>
+<li>GH 분양전환계약서 원본 + 증여계약서 원본</li>
+<li>인감증명서(부동산 매도용, 본인발급) 1통 + 인감도장, 신분증</li>
+<li>주민등록등본 1통</li>
+</ul>
+<div class="highlight">⚠️ 배우자 공동명의 시 증여비율은 0% 초과 100% 미만만 가능 (전부 증여 불가)<br>분양전환 계약 예약 시 <strong>부부공동명의 신청을 함께 예약</strong>해야 합니다.</div>
+명의변경 신청장소: 다산 자연&amp; e편한세상3차 임대센터 ☎ 031-515-0887`
+  },
+  저소득층: {
+    keywords: ['저소득','기초생활','수급자','지원','생계급여','의료급여','주거급여','교육급여'],
+    answer: `<span class="tag">🤝 저소득층(기초생활수급자) 지원</span><br>
+<strong>분할납부 계약조건 선택 시</strong>에만 적용됩니다. (일시납 선택 시 미적용)<br><br>
+<strong>지원 내용:</strong><br>
+<ul>
+<li>분양전환 사전안내 발송일('26.04.23) 당시 납입한 보증금을 계약금으로 분할납부 계약 가능</li>
+<li>할부이자(연 3.0%, 변동가능)는 7년 후 일시납 가능</li>
+</ul>
+<strong>대상:</strong> 기초생활수급자 (생계급여·의료급여·주거급여·교육급여 수급자)<br><br>
+<strong>신청 서류:</strong><br>
+<ul>
+<li>조기분양전환 저소득층(기초생활수급자) 지원 신청서</li>
+<li>기초생활수급자 증명서 등 자격증명서</li>
+</ul>
+<strong>제출방법:</strong> 등기우편 또는 방문접수 (평일 10시~17시)<br>
+☎ 031-515-0887`
+  },
+  수선보수: {
+    keywords: ['수선','보수','하자','AS','A/S','수리','관리'],
+    answer: `<span class="tag">🔧 분양전환 수선·보수 접수</span><br>
+<strong>접수 가능 기간:</strong> 개별세대 <strong>분양전환계약 체결 전일까지</strong>만 접수 가능<br>
+(계약 이후 세대 시설물 관리 책임은 계약자에게 있음)<br><br>
+<strong>접수 방법:</strong><br>
+→ 다산 자연&amp; e편한세상3차 아파트 관리사무소 내방 후 접수<br>
+→ ☎ 031-554-4915<br><br>
+<strong>수선·보수 불가 항목 (예시):</strong><br>
+<ul>
+<li>입주자 고의·과실·사용상 부주의로 인한 파손</li>
+<li>레인지후드 필터·램프 교환 등 소모성 비용</li>
+<li>결로 (온습도차에 의한 자연 현상)</li>
+<li>계약 체결 이후 접수된 수선·보수</li>
+</ul>`
+  },
+  연락처: {
+    keywords: ['전화','연락처','문의','임대센터','어디','주소','연락'],
+    answer: `<span class="tag">📞 업무별 연락처</span><br>
+<ul>
+<li>분양전환계약, 분양대금 납부, 소유권이전등기 서류 교부<br>→ <strong>다산 자연&amp; e편한세상3차 임대센터 ☎ 031-515-0887</strong></li>
+<li>분양전환 가격산정, 분양대상자 자격심사, 실거래가 신고<br>→ <strong>GH 건설임대처 ☎ 031-220-3272, 3273</strong></li>
+<li>전유부분 수선·보수<br>→ <strong>관리사무소 ☎ 031-554-4915</strong></li>
+<li>기금융자(주택도시기금) 대출<br>→ <strong>우리은행 담당 영업점 (p3 참조)</strong></li>
+<li>근저당권 설정 및 소유권이전등기<br>→ <strong>GH 위임 법무사 (법무법인 제이엘) ☎ 1899-4252 (내선 0095, 5429)</strong></li>
+<li>취득세<br>→ <strong>남양주시 부동산취득세팀 ☎ 031-590-4045, 4046, 2898</strong></li>
+</ul>
+<div class="highlight">📍 임대센터 주소: 경기도 남양주시 다산중앙로82번길 106, 206호 (6402동 앞 상가1동)</div>`
+  },
+  미계약: {
+    keywords: ['안하면','미계약','안했을때','기간끝','만기','10년'],
+    answer: `<span class="tag">❓ 미계약자 처리</span><br>
+<ul>
+<li>계약체결 기간 내 계약하지 않으면 현 임대차계약이 그대로 유지됩니다.</li>
+<li>계약체결 기간 이후에는 <strong>조기 분양전환계약 체결 불가</strong>합니다.</li>
+<li>단, 10년차 만기 분양전환 시점에 분양전환 계약은 가능합니다.</li>
+</ul>
+<div class="highlight">⚠️ 만기분양전환 시 분양전환가격은 <strong>만기분양전환 당시 감정평가금액</strong>으로 재산정되며, 조기분양전환 시점의 가격과 차이가 발생할 수 있습니다.</div>`
+  }
+};
+
+// ============================================================
+// 챗봇 엔진
+// ============================================================
+function findAnswer(q) {
+  const lq = q.replace(/\s/g, '');
+  for (const key in KB) {
+    const entry = KB[key];
+    if (entry.keywords.some(kw => lq.includes(kw.replace(/\s/g,'')))) {
+      return entry.answer;
+    }
+  }
+  return null;
+}
+
+function defaultAnswer(q) {
+  return `죄송합니다, 해당 질문에 대한 정보를 안내문에서 찾지 못했습니다. 😔<br><br>
+더 정확한 답변을 위해 아래로 문의해 주세요:<br>
+<ul>
+<li><strong>다산 자연&amp; e편한세상3차 임대센터</strong><br>☎ 031-515-0887</li>
+<li>운영시간: 평일 10:00~17:00 (점심 12~13시 제외)</li>
+</ul>
+위의 자주 묻는 질문 버튼도 활용해 보세요!`;
+}
+
+// ============================================================
+// UI 함수
+// ============================================================
+const messagesEl = document.getElementById('messages');
+const inputEl = document.getElementById('userInput');
+const sendBtn = document.getElementById('sendBtn');
+
+function addMsg(html, isUser) {
+  const row = document.createElement('div');
+  row.className = 'msg-row ' + (isUser ? 'user' : 'bot');
+
+  const avatar = document.createElement('div');
+  avatar.className = 'avatar';
+  avatar.textContent = isUser ? '👤' : '🤖';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.innerHTML = html;
+
+  row.appendChild(avatar);
+  row.appendChild(bubble);
+  messagesEl.appendChild(row);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function showTyping() {
+  const row = document.createElement('div');
+  row.className = 'msg-row bot';
+  row.id = 'typing-indicator';
+
+  const avatar = document.createElement('div');
+  avatar.className = 'avatar';
+  avatar.textContent = '🤖';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+
+  row.appendChild(avatar);
+  row.appendChild(bubble);
+  messagesEl.appendChild(row);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function hideTyping() {
+  const el = document.getElementById('typing-indicator');
+  if (el) el.remove();
+}
+
+function sendMessage() {
+  const text = inputEl.value.trim();
+  if (!text) return;
+  inputEl.value = '';
+  sendBtn.disabled = true;
+
+  addMsg(text, true);
+  showTyping();
+
+  setTimeout(() => {
+    hideTyping();
+    const ans = findAnswer(text) || defaultAnswer(text);
+    addMsg(ans, false);
+    sendBtn.disabled = false;
+    inputEl.focus();
+  }, 700 + Math.random() * 400);
+}
+
+function sendQuick(text) {
+  inputEl.value = text;
+  sendMessage();
+}
+</script>
+</body>
+</html>
